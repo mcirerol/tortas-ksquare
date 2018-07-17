@@ -1,0 +1,38 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>
+      Orders
+    </ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+  <ion-segment [(ngModel)]="show">
+    <ion-segment-button value="current">
+      Current
+    </ion-segment-button>
+    <ion-segment-button value="expired">
+      Expired
+    </ion-segment-button>
+  </ion-segment>
+  <div [ngSwitch]="show">
+    <ion-list *ngSwitchCase="'current'">
+      <ion-item *ngFor="let participant of currentParticipants | async" (click)="openEditParticipant(participant)" text-wrap>
+        {{participant.eventName}}, by {{participant.eventDueDate | date:'EEEE, MMM d, y h:mm a'}}
+        <p>Status: {{participant.status}}</p>
+        <p>Order: {{participant.orderString}}{{participant.complements != null ? '. ' + participant.complementsString: ''}}</p>
+        <p>Total: ${{participant.total}} </p>
+      </ion-item>
+    </ion-list>
+    <ion-list *ngSwitchCase="'expired'">
+      <ion-item *ngFor="let participant of expiredParticipants | async" (click)="openEditParticipant(participant)" text-wrap>
+        {{participant.eventName}}, by {{participant.eventDueDate | date:'EEEE, MMM d, y h:mm a'}}
+        <p>Status: {{participant.status}}</p>
+        <p>Order: {{participant.orderString}}{{participant.complements != null ? '. ' + participant.complementsString: ''}}</p>
+        <p>Total: ${{participant.total}} </p>
+      </ion-item>
+    </ion-list>
+  </div>
+  <ion-spinner *ngIf="!(participants | async)">
+  </ion-spinner>
+</ion-content>

@@ -1,0 +1,40 @@
+<!--
+  Generated template for the EventDetailPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+
+  <ion-navbar>
+    <ion-buttons end>
+      <button ion-button (click)="openActionSheet()">
+        <ion-icon name="more"></ion-icon>
+      </button>
+    </ion-buttons>
+    <ion-title>Event Detail: {{(event | async)?.name}}, by: {{(event | async)?.duedate | date}} </ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+  <div ion-fixed padding style="width: 100%; height: 100%;">
+    <div style="height: 85%;">
+      <ion-searchbar (ionInput)="getItems($event)" style="height: 15%"></ion-searchbar>
+      <ion-scroll scrollY="true" style="height: 85%;">
+        <ion-spinner *ngIf="!(participantsSearch | async)"></ion-spinner>
+        <ion-list>
+          <ion-item text-wrap *ngFor="let participant of participantsSearch | async" (click)="openSetStatus(participant)" class="participant">
+            {{participant.name}}
+            <p>Status: {{participant.status}}</p>
+            <p>Order: {{participant.orderString}}{{participant.complements != null ? '. ' + participant.complementsString: ''}}</p>
+            <p>Total: ${{participant.total}}. Paid: ${{participant.total - participant.toPay}} </p>
+          </ion-item>
+        </ion-list>
+      </ion-scroll>
+    </div>
+    <div class="order-detail">
+      <p>Total a Pagar: ${{total}}</p> <button (click)="openOrderDetail()" ion-button>Order Summary</button>
+    </div>
+  </div>

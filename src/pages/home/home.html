@@ -1,0 +1,30 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>Manage Events</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+  <ion-list>
+    <ion-item-sliding *ngFor="let event of manageEvents | async; index as i" #item>
+      <ion-item text-wrap (click)="goEventDetails(event)" >
+        {{event.name}}
+        <p>By date: {{event.duedate | date:'EEEE, MMM d, y h:mm a'}}</p>
+      </ion-item>
+      <ion-item-options side="right">
+        <button ion-button (click)="deleteEvent(item, event)" color="danger">
+          <ion-icon name="trash">
+          </ion-icon>
+        </button>
+      </ion-item-options>
+    </ion-item-sliding>
+  </ion-list>
+  <ion-spinner *ngIf="!(manageEvents | async)"></ion-spinner>
+  <ion-fab bottom right>
+    <button color="secondary" (click)="openNewEvent()" ion-fab>
+      <ion-icon name="add">
+
+      </ion-icon>
+    </button>
+  </ion-fab>
+</ion-content>

@@ -1,0 +1,20 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>
+      Settings
+    </ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-item>
+      <ion-icon name="ionic" item-start></ion-icon>
+      {{user.displayName}}
+    </ion-item>
+    <ion-item (click)="logout()">
+        <ion-icon name="person" item-start ></ion-icon>
+        Log Out
+      </ion-item>
+  </ion-list>
+</ion-content>

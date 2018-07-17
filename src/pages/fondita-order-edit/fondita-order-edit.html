@@ -1,0 +1,69 @@
+<!--
+  Generated template for the NewEventPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+
+  <ion-toolbar>
+    <ion-buttons end>
+      <button ion-button (click)="dismiss()">
+        <!-- <span showWhen="ios">Cancel</span> -->
+        <ion-icon name="md-close"></ion-icon>
+      </button>
+    </ion-buttons>
+    <ion-title>Edit Order</ion-title>
+  </ion-toolbar>
+
+</ion-header>
+
+
+<ion-content padding>
+  <form [formGroup]="orderForm" (ngSubmit)="submit('created')">
+    <ion-item no-lines>
+      <p>Select your food: </p>
+    </ion-item>
+    <ion-list radio-group formControlName="selectedIndex">
+      <ion-item text-wrap *ngFor="let item of items; let i = index;">
+        <ion-label>
+          {{item.name}}
+        </ion-label>
+        <ion-radio [value]="i"></ion-radio>
+      </ion-item>
+      <ion-item no-lines [hidden]="eventOrder.complements == null">
+        <p></p>
+      </ion-item>
+      <ion-item [hidden]="eventOrder.complements == null">
+        <ion-label>
+          Select Complements:
+        </ion-label>
+        <ion-select type="number" formControlName="complements" multiple="true">
+          <ion-option *ngFor="let complement of eventOrder.complements; let i = index" [value]="i">{{complement}}</ion-option>
+        </ion-select>
+      </ion-item>
+      <ion-item class="errorMessage" [hidden]="eventOrder.complements == null" no-lines *ngIf="!orderForm.controls.complements.valid">
+        <p style="color: #f53d3d ">You need to select at most {{eventOrder.maxCom}} complements</p>
+      </ion-item>
+      <ion-item>
+        <ion-label>
+          Tipo:
+        </ion-label>
+        <ion-select type="number" formControlName="price">
+          <ion-option *ngFor="let price of eventOrder.prices; let i = index" [value]="i">{{price.name}} ${{price.price}}</ion-option>
+        </ion-select>
+      </ion-item>
+      <ion-item class="errorMessage" no-lines *ngIf="!orderForm.valid && orderForm.hasError('selectFood')">
+        <p style="color: #f53d3d ">You need to select a food to order</p>
+      </ion-item>
+      <ion-item>
+        <a type="button" [hidden]="participant.status === 'initial' || participant.status === 'canceled'" ion-button default="true" [color]="'danger'" (click)="cancel()" item-end color="primary" icon-end>
+          Cancel Order
+        </a>
+        <button ion-button default="true" type="submit" item-end color="primary" icon-end [disabled]="!orderForm.valid">
+          Save
+        </button>
+      </ion-item>
+    </ion-list>
+  </form>
+</ion-content>
