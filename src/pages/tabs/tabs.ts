@@ -4,6 +4,10 @@ import { AboutPage } from '../about/about';
 import { ContactPage } from '../contact/contact';
 import { HomePage } from '../home/home';
 import firebase from 'firebase';
+import { EventProvider } from '../../providers/event/event';
+import { FCM } from '@ionic-native/fcm';
+import { Platform, ToastController } from 'ionic-angular';
+import { duration } from '../../../node_modules/moment';
 
 
 @Component({
@@ -16,21 +20,18 @@ export class TabsPage implements OnInit {
   tab3Root = ContactPage;
   messaging: firebase.messaging.Messaging;
 
-  constructor(@Inject('config') private config: any) {
+  constructor(@Inject('config') private config: any, private toastCtrl: ToastController, private eventService: EventProvider, private fcm: FCM, private platform: Platform) {
     this.messaging = firebase.messaging();
     console.log(`config: `, this.config);
 
     //this.messaging.useServiceWorker(serviceWorkerRegistration);
     //const messagingMock: any = <any>firebase.messaging;
-    
+
 
   }
 
   ngOnInit() {
-    // navigator.serviceWorker.getRegistration().then((serviceWorker) => {
-    //   this.messaging.useServiceWorker(serviceWorker);
-    //   // this.requestToken();
-    // })
+    this.startDeviceNotificationService();
   }
 
   requestToken() {
@@ -38,17 +39,64 @@ export class TabsPage implements OnInit {
       console.log('permission granted');
       return this.messaging.getToken();
     })
-      .then(token => console.log(`token ${token}`))
-      .then(()=> this.messaging.usePublicVapidKey(this.config.certificatePair))
-      .then(()=>this.registerMessage())
+      .then(token => { console.log('token', token); this.eventService.saveDevice(token) })
+      .then(() => this.messaging.usePublicVapidKey(this.config.certificatePair))
+      .then(() => this.registerMessage())
       .catch(error => console.error(error));
   }
 
-  registerMessage(){
+  registerMessage() {
     console.log('im here');
-    this.messaging.onMessage(()=>{
-      console.log('hello, can you hear me?')
-    })
+    this.messaging.onMessage(((message: any) => {
+      console.log('hello, can you hear me?');
+      console.log(message);
+      const not = new Notification('Tortas APP!', { body: message.notification.body, icon: '/assets/imgs/logo.png' });
+    }));
+  }
+
+  startDeviceNotificationService() {
+    console.log('start process');
+    if (this.platform.is('cordova')) {
+      this.startCordova();
+    } else {
+      this.startWeb();
+    }
+  }
+
+  startWeb() {
+    try {
+      console.log('start web');
+      navigator.serviceWorker.getRegistration().then((serviceWorker) => {
+        this.messaging.useServiceWorker(serviceWorker);
+        return this.requestToken();
+      })
+    }
+    catch (e) {
+      console.log('error ocurred tryng to register service worker, probably api not available');
+      console.error(e);
+    }
+
+  }
+
+  startCordova() {
+    console.log('start cordova');
+    this.fcm.getToken().then(token => {
+      console.log('token');
+      console.log(token);
+      this.eventService.saveDevice(token);
+    });
+
+    this.fcm.onNotification().subscribe(data => {
+      console.log('data');
+      console.log(data);
+      this.toastCtrl.create({ message: data.body, duration: 3000, position: 'middle' }).present();;
+      if (data.wasTapped) {
+        console.log("Received in background");
+      } else {
+        console.log("Received in foreground");
+      };
+    });
+
   }
 
 }

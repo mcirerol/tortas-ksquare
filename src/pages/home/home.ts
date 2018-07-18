@@ -8,6 +8,7 @@ import { Observable } from 'rxjs/Observable';
 import { UserProvider } from '../../providers/user/user';
 import { Event } from '../../shared/event';
 import { EventDetailPage } from '../event-detail/event-detail';
+import { NotificationProvider } from '../../providers/notification/notification';
 
 @Component({
   selector: 'page-home',
@@ -17,6 +18,7 @@ export class HomePage implements OnInit {
   manageEvents: Observable<Event[]>;
   constructor(public navCtrl: NavController,
     private eventService: EventProvider, private modalCtrl: ModalController,
+    private notificationService: NotificationProvider,
      private userService: UserProvider, private toastCtrl: ToastController, private alertCtrl: AlertController) {
 
   }
@@ -26,12 +28,21 @@ export class HomePage implements OnInit {
     modal.present();
     modal.onDidDismiss((event) => {
       if (event != null) {
-        this.eventService.saveEvent(event).subscribe(() => {
+        this.eventService.saveEvent(event).then((eventKey) => {
           console.log('event to save, ', event);
-          this.toastCtrl.create({ message: `event created succesfullly`, duration: 2000 }).present();
+          this.notifyNewEvent(event, eventKey);
+          this.toastCtrl.create({ message: `event created succesfully`, duration: 2000 }).present();
         }, error => { console.error(`error can't save event: `, error) })
       }
     })
+  }
+
+  private notifyNewEvent(event, eventKey){
+    this.notificationService.subscribeDevicesToNewEvent(eventKey).then(()=>{
+      console.log('sending notification');
+      this.notificationService.notify(eventKey, 'off', `A new event has been created!!. You can place orders now for ${event.name}`);
+    })
+
   }
 
   ngOnInit() {
@@ -76,6 +87,10 @@ export class HomePage implements OnInit {
     alert.present();
     item.close();
 
+  }
+
+  notify(){
+    this.notificationService.notify('-LHW7TLIB7Sk5UMY4BjD', 'off', 'hey paguen sus tortas mal pedos');
   }
 
 }

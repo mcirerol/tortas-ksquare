@@ -27,9 +27,9 @@ messaging.setBackgroundMessageHandler(function(payload) {
   // here you can override some options describing what's in the message; 
   // however, the actual content will come from the Webtask
   const notificationOptions = {
-    icon: '/assets/images/logo-128.png'
+    icon: '/assets/imgs/logo.png'
   };
-  return self.registration.showNotification(notificationTitle, notificationOptions);
+  return self.registration.showNotification("Tortas APP", notificationOptions);
 });
 
 self.toolbox.options.cache = {

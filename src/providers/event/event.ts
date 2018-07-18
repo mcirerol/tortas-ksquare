@@ -1,11 +1,12 @@
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { HttpClient, HttpResponse, HttpHeaders, HttpParams } from '@angular/common/http';
+import { Injectable, Inject } from '@angular/core';
 import { Event } from '../../shared/event';
 import { UserProvider } from '../user/user';
 import { AngularFireDatabase, DATABASE_PROVIDERS } from 'angularfire2/database';
 import { Observable } from 'rxjs/Observable';
 import { Participant } from '../../shared/participant';
 import * as _ from 'lodash';
+import { NotificationProvider } from '../notification/notification';
 
 /*
   Generated class for the EventProvider provider.
@@ -16,14 +17,14 @@ import * as _ from 'lodash';
 @Injectable()
 export class EventProvider {
 
-  constructor(private userService: UserProvider, private db: AngularFireDatabase) {
+  constructor(private userService: UserProvider, private db: AngularFireDatabase, private http: HttpClient, @Inject('config') private config, private notificationService: NotificationProvider) {
     console.log('Hello EventProvider Provider');
   }
 
-  saveEvent(event: Event): Observable<any> {
-    return this.getParticipants().map((participants) => {
+  saveEvent(event: Event): Promise<any> {
+    return this.getParticipants().then((participants) => {
       return this.saveEventFirebase(event, participants);
-    })
+    });
   }
 
   private saveEventFirebase(event: Event, participants) {
@@ -52,11 +53,11 @@ export class EventProvider {
         name
       }
     })
-    return this.db.object('/').update(updates)
+    return this.db.object('/').update(updates).then(() => eventKey);
   }
 
   private getParticipants() {
-    return this.db.object('users-ids').valueChanges().take(1).map((users) => {
+    return this.db.object('users-ids').valueChanges().take(1).toPromise().then((users) => {
       const newParticipants = {};
       Object.keys(users).forEach(userKey => {
         newParticipants[userKey] = {
@@ -132,8 +133,8 @@ export class EventProvider {
           updates[`events/${eventKey}`] = null;
           updates[`events-ids/${eventKey}`] = null;
         })
-        return this.db.object('/').update(updates).then((result)=>resolve()).catch((error)=>reject(error));
-      }, (error)=>{
+        return this.db.object('/').update(updates).then((result) => resolve()).catch((error) => reject(error));
+      }, (error) => {
         console.error(error);
         console.log('errorn getting user ids')
       })
@@ -144,7 +145,7 @@ export class EventProvider {
     const updates = {};
     updates[`users/${uid}/participants/${participant.key}`] = participant;
     updates[`events/${participant.key}/participants/${uid}`] = participant;
-    return this.db.object('/').update(updates);
+    return this.db.object('/').update(updates).then(() => participant);
   }
 
   saveParticipantStatus(userKey, eventKey, status, total) {
@@ -168,5 +169,19 @@ export class EventProvider {
     }
     return this.db.object('/').update(updates);
   }
+
+  saveDevice(deviceToken) {
+    const uid = this.userService.getCurrentUserState().uid;
+    this.db.object(`users-ids/${uid}/devices`).valueChanges().take(1).toPromise().then((devices) => {
+      if (devices != null && devices[deviceToken] != null) {
+        console.log('device already added');
+        return Promise.resolve('ok');
+      }
+      return this.notificationService.subscribeDevice(deviceToken)
+        .then(() => {
+          return this.db.object(`/users-ids/${uid}/devices/${deviceToken}`).set(true);
+        });
+    })
+  };
 
 }

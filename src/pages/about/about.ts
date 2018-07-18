@@ -5,6 +5,7 @@ import { UserProvider } from '../../providers/user/user';
 import { ParticipantEditPage } from '../participant-edit/participant-edit';
 import moment from 'moment';
 import { FonditaOrderEditPage } from '../fondita-order-edit/fondita-order-edit';
+import { NotificationProvider } from '../../providers/notification/notification';
 
 @Component({
   selector: 'page-about',
@@ -15,11 +16,12 @@ export class AboutPage implements OnInit {
   show: string = 'current';
   currentParticipants: any;
   expiredParticipants: any;
-  
+
   constructor(public navCtrl: NavController, private eventService: EventProvider,
     private userService: UserProvider,
     private alertCtrl: AlertController,
     private loadingCtrl: LoadingController,
+    private notificationService: NotificationProvider,
     private modalCtrl: ModalController, private toastCtrl: ToastController) {
 
   }
@@ -40,14 +42,14 @@ export class AboutPage implements OnInit {
         return participant;
       });
     });
-    this.currentParticipants = this.participants.map((participants)=>{
-      return participants.filter((participant)=>{
+    this.currentParticipants = this.participants.map((participants) => {
+      return participants.filter((participant) => {
         return participant.status !== 'expired';
       })
     });
 
-    this.expiredParticipants = this.participants.map((participants)=>{
-      return participants.filter((participant)=>{
+    this.expiredParticipants = this.participants.map((participants) => {
+      return participants.filter((participant) => {
         return participant.status === 'expired';
       })
     });
@@ -111,11 +113,16 @@ export class AboutPage implements OnInit {
 
   saveParticipant(participant) {
     const uid = this.userService.getCurrentUserState().uid;
-    this.eventService.saveParticipant(participant, uid).then(() => {
+    this.eventService.saveParticipant(participant, uid).then((participantSaved) => {
       this.toastCtrl.create({
         message: 'Order saved successfully',
         duration: 2000
       }).present();
+      if (participantSaved.total > 0) {
+        this.notificationService.subscribeToEventOn(participantSaved.eventKey);
+      } else {
+        this.notificationService.subscribeToEventOff(participantSaved.eventKey);
+      }
     }, (error) => {
       this.toastCtrl.create({
         message: 'An error ocurred creating the order',

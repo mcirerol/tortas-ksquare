@@ -94,6 +94,7 @@
     <plugin name="cordova-plugin-customurlscheme" spec="^4.3.0">
         <variable name="URL_SCHEME" value="io.tortas.ksquare" />
     </plugin>
-    <plugin name="cordova-universal-links-plugin" spec="https://github.com/walteram/cordova-universal-links-plugin" />
+    <plugin name="cordova-universal-links-plugin" spec="git+https://github.com/walteram/cordova-universal-links-plugin.git" />
+    <plugin name="cordova-plugin-fcm" spec="^2.1.2" />
     <engine name="android" spec="~7.0.0" />
 </widget>

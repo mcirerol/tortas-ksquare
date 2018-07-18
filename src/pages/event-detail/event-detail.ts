@@ -6,6 +6,7 @@ import { AngularFireDatabase } from 'angularfire2/database'
 import { EventProvider } from '../../providers/event/event';
 import { Observable } from 'rxjs/Observable';
 import { OrderDetailPage } from '../order-detail/order-detail';
+import { NotificationProvider } from '../../providers/notification/notification';
 
 /**
  * Generated class for the EventDetailPage page.
@@ -30,6 +31,7 @@ export class EventDetailPage implements OnInit {
   constructor(public navCtrl: NavController, public navParams: NavParams,
     private eventService: EventProvider, private action: ActionSheetController,
     private loadingCtrl: LoadingController,
+    private notificationService: NotificationProvider,
     private alertCtrl: AlertController, private toastCtrl: ToastController) {
     this.eventKey = navParams.get('eventKey');
   }
@@ -147,7 +149,7 @@ export class EventDetailPage implements OnInit {
         value: 'delivered',
         checked: participant.status === 'delivered'
       })
-      alert.present();
+    alert.present();
   }
 
   updateStatus(status, participant) {
@@ -166,6 +168,36 @@ export class EventDetailPage implements OnInit {
       })
   }
 
+  private sendNotification(message, type) {
+    const loading = this.loadingCtrl.create();
+    loading.present();
+    this.notificationService.notify(this.eventKey, type, message)
+      .then(() => {
+        loading.dismiss();
+        this.toastCtrl.create({ message: 'notification send', duration: 2000 }).present();
+      })
+      .catch(error=> {
+        console.error(error);
+        loading.dismiss();
+        this.toastCtrl.create({ message: 'An error happen', duration: 2000 }).present();
+      })
+      ;
+  }
+
+  private sendReminder(){
+    const message = `Don't forget to place your order for ${this.actualEvent.name}. Due date is approaching`;
+    const type = 'off';
+    this.sendNotification(message, type);
+  }
+
+  private sendOrderReady(){
+    const message = `You order is ready!!, please procede to receive your order for ${this.actualEvent.name}`;
+    const type = 'on';
+    this.sendNotification(message, type);
+  }
+
+
+
   openActionSheet() {
     this.action.create({
       title: 'Actions',
@@ -173,6 +205,14 @@ export class EventDetailPage implements OnInit {
         {
           text: `Add admins`,
           handler: () => { this.openSelectAdmins() }
+        },
+        {
+          text: `Send reminder`,
+          handler: () => { this.sendReminder() }
+        },
+        {
+          text: `Send order ready`,
+          handler: () => { this.sendOrderReady() }
         },
         // {
         //   text: `Copy to clipboard`,

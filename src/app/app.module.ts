@@ -1,10 +1,10 @@
 import { NgModule, ErrorHandler } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
+import { IonicApp, IonicModule, IonicErrorHandler, Platform } from 'ionic-angular';
 import { MyApp } from './app.component';
 import { AngularFireModule } from 'angularfire2';
 import { AngularFireAuthModule } from 'angularfire2/auth';
-import { firebaseConfig } from '../environment-prod'; //Change when going to prod
+import { firebaseConfig } from '../environment-dev'; //Change when going to prod
 import {IonicStorageModule} from '@ionic/storage';
 
 import { AboutPage } from '../pages/about/about';
@@ -12,7 +12,8 @@ import { ContactPage } from '../pages/contact/contact';
 import { HomePage } from '../pages/home/home';
 import { TabsPage } from '../pages/tabs/tabs';
 import { EventDetailPage } from '../pages/event-detail/event-detail';
-
+import { HttpClientModule } from '@angular/common/http';
+import { FCM } from '@ionic-native/fcm';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { LoginPage } from '../pages/login/login';
@@ -27,6 +28,7 @@ import { ParticipantEditPageModule } from '../pages/participant-edit/participant
 import { EventDetailModule } from '../pages/event-detail/event-detail.module';
 import { OrderDetailPageModule } from '../pages/order-detail/order-detail.module';
 import { FonditaOrderEditPageModule } from '../pages/fondita-order-edit/fondita-order-edit.module';
+import { NotificationProvider } from '../providers/notification/notification';
 
 @NgModule({
   declarations: [
@@ -52,7 +54,8 @@ import { FonditaOrderEditPageModule } from '../pages/fondita-order-edit/fondita-
     EventDetailModule,
     ParticipantEditPageModule,
     OrderDetailPageModule,
-    FonditaOrderEditPageModule
+    FonditaOrderEditPageModule,
+    HttpClientModule,
   ],
   bootstrap: [IonicApp],
   entryComponents: [
@@ -75,6 +78,9 @@ import { FonditaOrderEditPageModule } from '../pages/fondita-order-edit/fondita-
     {
       useValue: firebaseConfig, provide: 'config'
     },
+    NotificationProvider,
+    FCM,
+    //Platform,
   ]
 })
 export class AppModule {}

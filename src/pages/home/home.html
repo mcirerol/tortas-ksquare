@@ -7,7 +7,7 @@
 <ion-content padding>
   <ion-list>
     <ion-item-sliding *ngFor="let event of manageEvents | async; index as i" #item>
-      <ion-item text-wrap (click)="goEventDetails(event)" >
+      <ion-item text-wrap (click)="goEventDetails(event)">
         {{event.name}}
         <p>By date: {{event.duedate | date:'EEEE, MMM d, y h:mm a'}}</p>
       </ion-item>
@@ -23,6 +23,13 @@
   <ion-fab bottom right>
     <button color="secondary" (click)="openNewEvent()" ion-fab>
       <ion-icon name="add">
+
+      </ion-icon>
+    </button>
+  </ion-fab>
+  <ion-fab bottom left>
+    <button color="secondary" (click)="notify()" ion-fab>
+      <ion-icon name="mail">
 
       </ion-icon>
     </button>
