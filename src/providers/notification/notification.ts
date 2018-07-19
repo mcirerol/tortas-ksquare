@@ -29,12 +29,10 @@ export class NotificationProvider {
     };
     console.log(idToken);
     const query = new HttpParams().set('idToken', idToken);
-    this.http.post(this.config.host + '/devices/notifications', body, { params: query }).toPromise().then((response: HttpResponse<any>) => {
+    return this.http.post(this.config.host + '/devices/notifications', body, { params: query }).toPromise().then((response: HttpResponse<any>) => {
       console.log('response');
       console.log(response);
-    }, (error) => {
-      console.error(error);
-    })
+    });
   }
 
 
@@ -47,9 +45,7 @@ export class NotificationProvider {
       return this.http.post(this.config.host + '/events/subscriptions', body, { params: query }).toPromise().then((response: HttpResponse<any>) => {
         console.log('response');
         console.log(response);
-      }, (error) => {
-        console.error(error);
-      })
+      });
     }
     return this.userService.getCurrentUserState().getIdToken().then(idToken => {
       return doSubcribe(idToken);
@@ -65,8 +61,6 @@ export class NotificationProvider {
       return this.http.post(this.config.host + '/devices/subscriptions', body, { params: query }).toPromise().then((response: HttpResponse<any>) => {
         console.log('response');
         console.log(response);
-      }, (error) => {
-        console.error(error);
       })
     }
     return this.userService.getCurrentUserState().getIdToken().then(idToken => {
@@ -96,11 +90,9 @@ export class NotificationProvider {
       return this.http.put(this.config.host + '/users/subscriptions', body, { params: query }).toPromise().then((response: HttpResponse<any>) => {
         console.log('response');
         console.log(response);
-      }, (error) => {
-        console.error(error);
-      })
+      });
     }
-    this.getIdToken().then((idToken) => doUpdate(idToken));
+    return this.getIdToken().then((idToken) => doUpdate(idToken));
   }
 
 }

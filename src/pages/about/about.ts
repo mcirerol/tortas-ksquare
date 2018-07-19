@@ -119,9 +119,15 @@ export class AboutPage implements OnInit {
         duration: 2000
       }).present();
       if (participantSaved.total > 0) {
-        this.notificationService.subscribeToEventOn(participantSaved.eventKey);
+        this.notificationService.subscribeToEventOn(participantSaved.eventKey).catch(error => {
+          console.log(`error on notification service`);
+          console.error(error);
+        });
       } else {
-        this.notificationService.subscribeToEventOff(participantSaved.eventKey);
+        this.notificationService.subscribeToEventOff(participantSaved.eventKey).catch(error => {
+          console.log(`error on notification service`);
+          console.error(error);
+        });
       }
     }, (error) => {
       this.toastCtrl.create({

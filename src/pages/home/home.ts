@@ -19,7 +19,7 @@ export class HomePage implements OnInit {
   constructor(public navCtrl: NavController,
     private eventService: EventProvider, private modalCtrl: ModalController,
     private notificationService: NotificationProvider,
-     private userService: UserProvider, private toastCtrl: ToastController, private alertCtrl: AlertController) {
+    private userService: UserProvider, private toastCtrl: ToastController, private alertCtrl: AlertController) {
 
   }
 
@@ -37,10 +37,13 @@ export class HomePage implements OnInit {
     })
   }
 
-  private notifyNewEvent(event, eventKey){
-    this.notificationService.subscribeDevicesToNewEvent(eventKey).then(()=>{
+  private notifyNewEvent(event, eventKey) {
+    this.notificationService.subscribeDevicesToNewEvent(eventKey).then(() => {
       console.log('sending notification');
-      this.notificationService.notify(eventKey, 'off', `A new event has been created!!. You can place orders now for ${event.name}`);
+      this.notificationService.notify(eventKey, 'off', `A new event has been created!!. You can place orders now for ${event.name}`).catch(error => {
+        console.log(`error on notification service`);
+        console.error(error);
+      });
     })
 
   }
@@ -89,7 +92,7 @@ export class HomePage implements OnInit {
 
   }
 
-  notify(){
+  notify() {
     this.notificationService.notify('-LHW7TLIB7Sk5UMY4BjD', 'off', 'hey paguen sus tortas mal pedos');
   }
 

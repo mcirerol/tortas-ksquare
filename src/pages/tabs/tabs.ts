@@ -35,12 +35,13 @@ export class TabsPage implements OnInit {
   }
 
   requestToken() {
+    this.messaging.usePublicVapidKey(this.config.certificatePair);
     this.messaging.requestPermission().then(() => {
       console.log('permission granted');
       return this.messaging.getToken();
     })
       .then(token => { console.log('token', token); this.eventService.saveDevice(token) })
-      .then(() => this.messaging.usePublicVapidKey(this.config.certificatePair))
+      //.then(() => this.messaging.usePublicVapidKey(this.config.certificatePair))
       .then(() => this.registerMessage())
       .catch(error => console.error(error));
   }
@@ -84,6 +85,9 @@ export class TabsPage implements OnInit {
       console.log('token');
       console.log(token);
       this.eventService.saveDevice(token);
+    }).catch(error => {
+      console.log('error getting token and saving device');
+      console.error(error);
     });
 
     this.fcm.onNotification().subscribe(data => {

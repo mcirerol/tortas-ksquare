@@ -4,7 +4,7 @@ import { IonicApp, IonicModule, IonicErrorHandler, Platform } from 'ionic-angula
 import { MyApp } from './app.component';
 import { AngularFireModule } from 'angularfire2';
 import { AngularFireAuthModule } from 'angularfire2/auth';
-import { firebaseConfig } from '../environment-dev'; //Change when going to prod
+import { firebaseConfig } from '../environment-prod'; //Change when going to prod
 import {IonicStorageModule} from '@ionic/storage';
 
 import { AboutPage } from '../pages/about/about';
